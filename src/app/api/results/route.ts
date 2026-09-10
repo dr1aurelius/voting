@@ -23,7 +23,7 @@ export async function GET() {
     });
   }
 
-  const [positions, voteCounts] = await Promise.all([
+  const [positions, voteCounts, verifiedVoters] = await Promise.all([
     prisma.position.findMany({
       where: { votingSessionId: session.id },
       orderBy: { displayOrder: "asc" },
@@ -40,6 +40,9 @@ export async function GET() {
       where: { votingSessionId: session.id },
       _count: { _all: true },
     }),
+    prisma.voterParticipation.count({
+      where: { votingSessionId: session.id, eligible: true, verified: true },
+    }),
   ]);
 
   const countsByCandidate = new Map(
@@ -50,6 +53,7 @@ export async function GET() {
     available: true,
     status: session.status === "OPEN" ? "LIVE" : "FINAL",
     sessionName: session.name,
+    verifiedVoters,
     updatedAt: now.toISOString(),
     positions: positions.map((position) => ({
       name: position.name,

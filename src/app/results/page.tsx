@@ -8,6 +8,7 @@ type ResultsData = {
   message?: string;
   status?: "LIVE" | "FINAL";
   sessionName?: string;
+  verifiedVoters?: number;
   updatedAt?: string;
   positions?: Array<{
     name: string;
@@ -65,6 +66,12 @@ export default function ResultsPage() {
             {results?.status === "LIVE" ? "Live results" : results?.status === "FINAL" ? "Final results" : "Results"}
             {results?.status === "LIVE" && <span className="status-note">Updating automatically</span>}
           </div>
+          {results?.available && (
+            <p className="results-voter-count" aria-live="polite">
+              Verified voters - {results.verifiedVoters ?? 0}
+              {results.status === "LIVE" && <span> live voters count</span>}
+            </p>
+          )}
           {results?.sessionName && <p className="muted-copy">{results.sessionName}</p>}
         </section>
 
