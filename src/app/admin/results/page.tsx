@@ -22,7 +22,7 @@ export default async function AdminResultsPage() {
     );
   }
 
-  const [positions, voteCounts, eligibleVoters, submittedVoters] = await Promise.all([
+  const [positions, voteCounts, eligibleVoters, verifiedVoters, submittedVoters] = await Promise.all([
     prisma.position.findMany({
       where: { votingSessionId: session.id },
       orderBy: { displayOrder: "asc" },
@@ -37,6 +37,7 @@ export default async function AdminResultsPage() {
       _count: { _all: true },
     }),
     prisma.voterParticipation.count({ where: { votingSessionId: session.id, eligible: true } }),
+    prisma.voterParticipation.count({ where: { votingSessionId: session.id, eligible: true, verified: true } }),
     prisma.voterParticipation.count({ where: { votingSessionId: session.id, hasVoted: true } }),
   ]);
 
@@ -52,7 +53,7 @@ export default async function AdminResultsPage() {
         </div>
         <div className="text-left sm:text-right">
           <span className="inline-flex border border-gray-900 px-3 py-1 text-xs font-bold uppercase tracking-widest">{session.status}</span>
-          <p className="mt-2 text-sm text-gray-600">{submittedVoters} of {eligibleVoters} eligible voters submitted</p>
+          <p className="mt-2 text-sm text-gray-600">Verified voters - {verifiedVoters} · {submittedVoters} of {eligibleVoters} eligible voters submitted</p>
         </div>
       </div>
 

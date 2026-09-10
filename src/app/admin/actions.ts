@@ -166,9 +166,15 @@ export async function approveApplication(id: string, votingSessionId?: string) {
     });
 
     revalidatePath("/admin/committee");
+    revalidatePath(`/admin/committee/${id}`);
+    revalidatePath("/admin/candidates");
     return { success: true };
   } catch (error: unknown) {
     console.error("Approve application error:", error);
-    return { success: false, error: (error as Error).message || "Failed to approve application." };
+    const prismaError = error as { code?: string; meta?: { target?: string[] } };
+    if (prismaError.code === "P2002") {
+      return { success: false, error: `A record with this ${prismaError.meta?.target?.join(", ") || "value"} already exists.` };
+    }
+    return { success: false, error: error instanceof Error ? error.message : "Failed to approve application." };
   }
 }

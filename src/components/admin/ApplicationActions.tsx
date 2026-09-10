@@ -27,6 +27,10 @@ export default function ApplicationActions({
   const handleApprove = () => {
     setError(null);
     if (application.wantsOfficialCommittee && application.selectedGroup) {
+      if (availableSessions.length === 0) {
+        setError("No draft or open voting session is available for this application's group.");
+        return;
+      }
       setShowSessionModal(true);
     } else {
       executeApprove();
@@ -113,7 +117,7 @@ export default function ApplicationActions({
                       ))}
                     </select>
                   </div>
-                  
+
                   {selectedSessionId && (
                     <div className="mt-3 text-sm text-gray-600 bg-gray-50 p-2 rounded border">
                       <strong>Positions in this session:</strong>
